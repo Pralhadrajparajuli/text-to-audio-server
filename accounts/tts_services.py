@@ -11,7 +11,7 @@ class TTSModel:
     def generate_audio(self, text):
         # Process the input text
         processed_text = self.preprocess_text(text)
-
+        
         # Generate mel spectrogram
         mel_spectrogram = self.model.predict(processed_text)  # Call the Tacotron model
         

@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'rest_framework', 
-   'rest_framework_simplejwt',
+    'rest_framework_simplejwt',
+    'training',
+    'tacotron2',
 ]
 
 SIMPLE_JWT = {
