@@ -6,6 +6,8 @@ from utils.custom_response import custom_response
 from django.forms.models import model_to_dict
 from accounts.models import CustomUser
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.utils import datetime_to_epoch
+from datetime import datetime, timedelta
 
 
 class RegisterView(APIView):
@@ -60,6 +62,9 @@ class LoginView(APIView):
         email = data.get("email")
         password = data.get("password")
 
+        print("Email:", email)
+        print("Password:", password)
+
         user = authenticate(email=email, password=password)
         if not user:
             return custom_response(
@@ -71,12 +76,11 @@ class LoginView(APIView):
         # Successful login
         user_data = model_to_dict(user)
 
-        # Generate JWT Token
+       # Generate JWT Token with correct expiration
         refresh = RefreshToken.for_user(user)
         access_token = refresh.access_token
-
-        # Add the token to the response
-        user_data["access_token"] = str(access_token)
+        access_token_str = str(access_token)
+        user_data["access_token"] = access_token_str
 
         return custom_response(
             status_bool=True,
