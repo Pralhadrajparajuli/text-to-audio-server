@@ -18,8 +18,6 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import include
 
-from accounts.views.tts_views import TTSAPIView
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/accounts/', include('accounts.urls')),

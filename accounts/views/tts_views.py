@@ -6,14 +6,13 @@ from django.http import HttpResponse
 import os
 from accounts.serializers import TextInputSerializer
 from utils.custom_response import custom_response
-from utils.functions import load_tsv
+from utils.functions import get_audio_file_path, load_tsv
 from utils.functions import find_best_match_fuzzy
 from utils.functions import generate_combined_audio
 from utils.functions import update_tsv
 import random
 from scipy.io.wavfile import write
 import numpy as np
-
 
 class TTSAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -44,14 +43,16 @@ class TTSAPIView(APIView):
         audio_id = find_best_match_fuzzy(text, full_text_mapping)
         print(f"Match found for full text: {audio_id}")
         if audio_id:
-            audio_file_path = os.path.join(audio_dir, f"{audio_id}.wav")
-
-            if os.path.exists(audio_file_path):
+            # Try finding the audio file in both .wav and .mp3 formats
+            audio_file_path = get_audio_file_path(audio_dir, audio_id)
+            if audio_file_path:
+                print(f"Found audio file: {audio_file_path}")
                 with open(audio_file_path, 'rb') as f:
-                    response = HttpResponse(f.read(), content_type="audio/wav")
-                    response['Content-Disposition'] = f'attachment; filename="{audio_id}.wav"'
+                    content_type = "audio/wav" if audio_file_path.endswith('.wav') else "audio/mpeg"
+                    response = HttpResponse(f.read(), content_type=content_type)
+                    response['Content-Disposition'] = f'attachment; filename="{audio_id}{os.path.splitext(audio_file_path)[1]}"'
                     return response
-        
+
         print(f"No full text match found for: {text}")
 
         # Step 2: Fallback to generating audio by combining syllables

@@ -41,8 +41,6 @@ INSTALLED_APPS = [
     'accounts',
     'rest_framework', 
     'rest_framework_simplejwt',
-    'training',
-    'tacotron2',
 ]
 
 SIMPLE_JWT = {

@@ -6,3 +6,5 @@ pip install g2p_en epitran
 pip install django djangorestframework
 pip install fuzzywuzzy python-Levenshtein
 pip install tensorboard tqdm
+ brew install ffmpeg
+ pip install pydub

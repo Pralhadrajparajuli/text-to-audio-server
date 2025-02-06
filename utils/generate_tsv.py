@@ -376,8 +376,30 @@ data = [
     ('voice373', 'छा'),
     ('voice374', 'छाै'),
     ('voice375', 'ज'),
-    ('voice376', 'जा')
+    ('voice376', 'जा'),
+    ('voice377', '१'),
+    ('voice378', '२'),
+    ('voice379', '३'),
+    ('voice380', '४'),
+    ('voice381', '५'),
+    ('voice382', '६'),
+    ('voice383', '७'),
+    ('voice384', '८'),
+    ('voice385', '९'),
+    ('voice386', '०')
 ]
+
+# voice00000 o
+# voice01111 १
+# voice02222 २
+# voice03333 ३
+# voice04444 ४
+# voice05555 ५
+# voice06666 ६
+# voice07777 ७
+# voice8888 ८
+# voice0999 ९
+
 
 # voice279 म्
 # voice280 य
