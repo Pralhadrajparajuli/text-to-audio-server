@@ -1,13 +1,29 @@
 import csv
 from fuzzywuzzy import process
 import numpy as np
-from pydub import AudioSegment
 import os
 from scipy.io.wavfile import read
+import noisereduce as nr
+from scipy.signal import butter, filtfilt
+from pydub import AudioSegment
+from pydub.effects import compress_dynamic_range
 
 
 AudioSegment.ffmpeg = "/usr/local/bin/ffmpeg"
 AudioSegment.ffprobe = "/usr/local/bin/ffprobe"
+
+
+def apply_noise_reduction(audio_data, sample_rate):
+    """Apply noise reduction to the audio."""
+    reduced_audio = nr.reduce_noise(y=audio_data, sr=sample_rate)
+    return reduced_audio
+
+def high_pass_filter(audio_data, sample_rate, cutoff=1000):
+    """Apply high-pass filter to remove low-frequency noise."""
+    nyquist = 0.5 * sample_rate
+    normal_cutoff = cutoff / nyquist
+    b, a = butter(1, normal_cutoff, btype='high', analog=False)
+    return filtfilt(b, a, audio_data)
 
 def load_tsv(file_path):
     """Load TSV file and map sentences to audio IDs."""
@@ -91,8 +107,7 @@ def get_audio_file_path(audio_dir, audio_id):
     return None
 
 def generate_combined_audio(text, syllable_mapping, audio_dir):
-    """Generate combined audio for text."""
-   
+    """Generate combined audio for text with additional audio cleaning steps."""
     audio_clips = []
     syllables = split_into_syllables(text, syllable_mapping)
 
@@ -104,7 +119,6 @@ def generate_combined_audio(text, syllable_mapping, audio_dir):
                 # Handle .mp3 file using pydub
                 audio_data = AudioSegment.from_mp3(audio_file_path)
                 sample_rate = audio_data.frame_rate  # Get the frame rate before converting to numpy
-                audio_data = np.array(audio_data.get_array_of_samples())
             else:
                 # Handle .wav file using scipy
                 sample_rate, audio_data = read(audio_file_path)  # Read both sample rate and audio data
@@ -116,6 +130,9 @@ def generate_combined_audio(text, syllable_mapping, audio_dir):
 
     if audio_clips:
         combined_audio = np.concatenate(audio_clips)
+        combined_audio = apply_noise_reduction(combined_audio, sample_rate)
+        combined_audio = high_pass_filter(combined_audio, sample_rate)
+
         return sample_rate, combined_audio
     return None, None
 

@@ -14,6 +14,7 @@ import random
 from scipy.io.wavfile import write
 import numpy as np
 
+
 class TTSAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
