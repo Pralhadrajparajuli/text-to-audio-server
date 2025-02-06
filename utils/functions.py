@@ -57,6 +57,24 @@ def trim_silence(audio, sample_rate, threshold=100):
     trimmed_audio = audio[np.abs(audio) > threshold]
     return np.concatenate((trimmed_audio, np.zeros(int(0.01 * sample_rate))))  # Add slight padding
 
+def match_syllable(syllable, syllable_mapping):
+    """Match syllable and check for variations like ौ vs. ाै."""
+    # First try the exact match
+    if syllable in syllable_mapping:
+        return syllable_mapping[syllable]
+    
+    # Check for specific variations
+    variations = {
+        'ौ': 'ाै',  # Handle alternate variations of syllables
+    }
+
+    if syllable in variations:
+        alternative_syllable = variations[syllable]
+        if alternative_syllable in syllable_mapping:
+            return syllable_mapping[alternative_syllable]
+
+    # Return None if no match is found
+    return None
 
 def split_into_syllables(text, syllable_mapping):
     """Split text into syllables and map to audio IDs."""
@@ -83,7 +101,7 @@ def split_into_syllables(text, syllable_mapping):
         else:
             # When a new character is encountered, check if the current syllable has a valid mapping
             if current_syllable:
-                mapped_syllable = syllable_mapping.get(current_syllable)
+                mapped_syllable = match_syllable(current_syllable, syllable_mapping)  # Use match_syllable for variations
                 if mapped_syllable:
                     syllables.append(mapped_syllable)
                 else:
@@ -92,7 +110,7 @@ def split_into_syllables(text, syllable_mapping):
 
     # After the loop, check if the last syllable has a valid mapping
     if current_syllable:
-        mapped_syllable = syllable_mapping.get(current_syllable)
+        mapped_syllable = match_syllable(current_syllable, syllable_mapping)  # Use match_syllable for variations
         if mapped_syllable:
             syllables.append(mapped_syllable)
         else:
@@ -154,6 +172,8 @@ def combine_syllables_to_word(syllables, audio_dir):
         combined_word_audio = np.concatenate(word_audio)
 
         # Make sure the transition between syllables is quick by removing any silence padding between them
+
+
         combined_word_audio = apply_noise_reduction(combined_word_audio, sample_rate)
         # combined_word_audio = high_pass_filter(combined_word_audio, sample_rate)
 
@@ -176,11 +196,23 @@ def generate_combined_audio_for_words(text, syllable_mapping, audio_dir):
 
     # Combine all words into a single audio
     if audio_clips:
-        combined_audio = np.concatenate(audio_clips)
-        combined_audio = apply_noise_reduction(combined_audio, sample_rate)
+        padding_length = 7000  # Adjust this based on your needs
+
+        # Apply padding between clips
+        audio_clips_with_padding = []
+        for i, clip in enumerate(audio_clips):
+            audio_clips_with_padding.append(clip)
+            # Add padding after each clip except the last one
+            if i < len(audio_clips) - 1:
+                audio_clips_with_padding.append(np.zeros(padding_length))  # Add padding
+
+        # Concatenate the clips with padding
+        combined_audio = np.concatenate(audio_clips_with_padding)
+        # combined_audio = apply_noise_reduction(combined_audio, sample_rate)
         combined_audio = high_pass_filter(combined_audio, sample_rate)
 
         return sample_rate, combined_audio
+    
     return None, None
 
 def update_tsv(file_path, new_audio_id, text):
