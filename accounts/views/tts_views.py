@@ -6,10 +6,8 @@ from django.http import HttpResponse
 import os
 from accounts.serializers import TextInputSerializer
 from utils.custom_response import custom_response
-from utils.functions import get_audio_file_path, load_tsv
+from utils.functions import generate_combined_audio_for_words, get_audio_file_path, load_tsv
 from utils.functions import find_best_match_fuzzy
-from utils.functions import generate_combined_audio
-from utils.functions import update_tsv
 import random
 from scipy.io.wavfile import write
 import numpy as np
@@ -57,7 +55,7 @@ class TTSAPIView(APIView):
         print(f"No full text match found for: {text}")
 
         # Step 2: Fallback to generating audio by combining syllables
-        sample_rate, combined_audio = generate_combined_audio(text, syllable_mapping, syllable_dir)
+        sample_rate, combined_audio = generate_combined_audio_for_words(text, syllable_mapping, syllable_dir)
         if combined_audio is None:
             return custom_response(
                 status_bool=False,
