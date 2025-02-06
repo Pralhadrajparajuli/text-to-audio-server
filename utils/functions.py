@@ -84,20 +84,35 @@ def split_into_syllables(text, syllable_mapping):
 
     # Nepali vowel signs and modifiers
     vowels = ['ो', 'ा', 'ी', 'ु', 'े', 'ै', 'ि', 'ं', 'ँ']
+    consonants = ['क', 'ख', 'ग', 'घ', 'च', 'छ', 'ज', 'झ', 'ट', 'ठ', 'ड', 'ढ', 'त', 'थ', 'द', 'ध', 'न', 'प', 'फ', 'ब', 'भ', 'म', 'य', 'र', 'ल', 'व', 'श', 'ष', 'स', 'ह', 'ळ', 'क्ष', 'ज्ञ']
     special_combination_chars = ['ृ']  # Characters like 'ृ' that need special handling
 
-    for char in text:
+    i = 0  # Index to track position in the word
+    while i < len(text):
+        char = text[i]
+
+        # Check if the previous character is 'ं' and the current one is a consonant like 'र'
+        if char == 'ं' and i > 0 and text[i-1] in consonants:
+            # Combine previous syllable with 'न्'
+            current_syllable = text[i-1] + 'न्'
+            syllables.append(syllable_mapping.get(current_syllable))  # Add the combined syllable
+            i += 1  # Skip the current 'ं' character
+            continue
+
         # If the character is a vowel or diacritic, append it to the current syllable
-        if char in vowels:
+        elif char in vowels:
             current_syllable += char
+            i += 1
         elif char == '्':  # Handling '्' (virama) as part of the previous syllable
             current_syllable += char
+            i += 1
         elif char in special_combination_chars:
             # Special handling for 'ृ' to combine the previous syllable with 'रि'
             if current_syllable:
                 combined_syllable = current_syllable[:-1] + "्" + "रि"  # Combine consonant and 'रि'
                 syllables.append(syllable_mapping.get(combined_syllable))  # Add the combined syllable
             current_syllable = ''  # Reset current syllable after combining
+            i += 1
         else:
             # When a new character is encountered, check if the current syllable has a valid mapping
             if current_syllable:
@@ -107,6 +122,7 @@ def split_into_syllables(text, syllable_mapping):
                 else:
                     print(f"No match found for syllable: {current_syllable}")
             current_syllable = char
+            i += 1
 
     # After the loop, check if the last syllable has a valid mapping
     if current_syllable:
@@ -137,6 +153,15 @@ def get_audio_file_path(audio_dir, audio_id):
             combined_audio_id = base_consonant + '्' + 'रि'  # Combine with 'रि'
             wav_file_path = os.path.join(audio_dir, f"{combined_audio_id}.wav")
             mp3_file_path = os.path.join(audio_dir, f"{combined_audio_id}.mp3")
+        
+        if not os.path.exists(wav_file_path) and not os.path.exists(mp3_file_path):
+            # Handle complex syllables with 'ं' like 'कं' -> 'क' + '्' + 'न'
+            if 'ं' in audio_id:  # If the syllable contains 'ं'
+                base_consonant = audio_id[:-1]
+                combined_audio_id = base_consonant + 'न्'
+                wav_file_path = os.path.join(audio_dir, f"{combined_audio_id}.wav")
+                mp3_file_path = os.path.join(audio_dir, f"{combined_audio_id}.mp3")
+
 
     # If the audio file exists, return the path
     if os.path.exists(wav_file_path):
