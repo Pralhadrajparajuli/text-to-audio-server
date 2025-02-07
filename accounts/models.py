@@ -3,29 +3,27 @@ from django.utils import timezone
 from django.contrib.auth.hashers import make_password, check_password
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-import tensorflow as tf
-
+from django.contrib.auth.models import BaseUserManager
 
 # Custom User Manager
-class CustomUserManager(models.Manager):
-    def create_user(self, email, password, **extra_fields):
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError(_("The Email field must be set"))
-        email = self.normalize_email(email)
+            raise ValueError("The Email field must be set")
+        email = self.normalize_email(email)  # Fixed issue
         user = self.model(email=email, **extra_fields)
         user.set_password(password)  # Hashing the password
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password, **extra_fields):
+    def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
+
     def get_by_natural_key(self, email):
         """Override to return user by email (natural key)."""
         return self.get(email=email)
-    
-
     
 class CustomUser(models.Model):
     email = models.EmailField(unique=True)
@@ -57,9 +55,9 @@ class CustomUser(models.Model):
     def save(self, *args, **kwargs):
         # Ensure that the user has a valid email and password
         if not self.email:
-            raise ValidationError(_("Email cannot be blank"))
+            raise ValidationError("Email cannot be blank")
         if not self.password:
-            raise ValidationError(_("Password cannot be blank"))
+            raise ValidationError("Password cannot be blank")
         super().save(*args, **kwargs)
 
     def get_full_name(self):
@@ -79,5 +77,3 @@ class CustomUser(models.Model):
     def is_anonymous(self):
         """Returns whether the user is anonymous"""
         return not self.is_active
-    
-

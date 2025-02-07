@@ -15,7 +15,6 @@ class RegisterView(APIView):
 
     def post(self, request):
         data = request.data
-        username = data.get("username")
         email = data.get("email")
         password = data.get("password")
         password2 = data.get("password2")
@@ -27,14 +26,6 @@ class RegisterView(APIView):
                 message="Passwords do not match.",
                 http_status=status.HTTP_400_BAD_REQUEST
             )
-
-        # Validate username and email
-        if CustomUser.objects.filter(username=username).exists():
-            return custom_response(
-                status_bool=False,
-                message="Username already exists.",
-                http_status=status.HTTP_400_BAD_REQUEST
-            )
         if CustomUser.objects.filter(email=email).exists():
             return custom_response(
                 status_bool=False,
@@ -43,7 +34,7 @@ class RegisterView(APIView):
             )
 
         # Create user
-        user = CustomUser.objects.create_user(username=username, email=email, password=password)
+        user = CustomUser.objects.create_user(email=email, password=password)
         user_data = model_to_dict(user)
 
         return custom_response(

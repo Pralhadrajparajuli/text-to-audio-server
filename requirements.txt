@@ -1,10 +1,47 @@
-pip install torch torchvision torchaudio  
-pip install numpy pandas scipy matplotlib
-pip install tensorflow
-pip install librosa soundfile
-pip install g2p_en epitran
-pip install django djangorestframework
-pip install fuzzywuzzy python-Levenshtein
-pip install tensorboard tqdm
- brew install ffmpeg
- pip install pydub
+asgiref==3.8.1
+audioread==3.0.1
+certifi==2025.1.31
+cffi==1.17.1
+charset-normalizer==3.4.1
+contourpy==1.3.1
+cycler==0.12.1
+decorator==5.1.1
+Django==5.1.6
+djangorestframework==3.15.2
+djangorestframework_simplejwt==5.4.0
+fonttools==4.55.8
+fuzzywuzzy==0.18.0
+idna==3.10
+joblib==1.4.2
+kiwisolver==1.4.8
+lazy_loader==0.4
+Levenshtein==0.26.1
+librosa==0.10.2.post1
+llvmlite==0.44.0
+matplotlib==3.10.0
+msgpack==1.1.0
+noisereduce==3.0.3
+numba==0.61.0
+numpy==2.1.3
+packaging==24.2
+pillow==11.1.0
+platformdirs==4.3.6
+pooch==1.8.2
+pycparser==2.22
+pydub==0.25.1
+PyJWT==2.10.1
+pyparsing==3.2.1
+python-dateutil==2.9.0.post0
+python-Levenshtein==0.26.1
+RapidFuzz==3.12.1
+requests==2.32.3
+scikit-learn==1.6.1
+scipy==1.15.1
+six==1.17.0
+soundfile==0.13.1
+soxr==0.5.0.post1
+sqlparse==0.5.3
+threadpoolctl==3.5.0
+tqdm==4.67.1
+typing_extensions==4.12.2
+urllib3==2.3.0
