@@ -14,7 +14,7 @@ import numpy as np
 
 
 class TTSAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = TextInputSerializer(data=request.data)

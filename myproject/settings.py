@@ -28,6 +28,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Adjust if you're using a different port
+    "http://127.0.0.1:5173",  # If using Vite's default port
+]
+
 
 # Application definition
 
@@ -41,6 +46,7 @@ INSTALLED_APPS = [
     'accounts',
     'rest_framework', 
     'rest_framework_simplejwt',
+    'corsheaders'
 ]
 
 SIMPLE_JWT = {
@@ -56,9 +62,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'myproject.urls'
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {
