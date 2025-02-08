@@ -54,6 +54,11 @@ def find_best_match_fuzzy(text, syllable_mapping):
 
 def trim_silence(audio, sample_rate, threshold=100):
     """Trim silence from audio data."""
+    # Convert AudioSegment to numpy array
+    if isinstance(audio, AudioSegment):
+        audio = np.array(audio.get_array_of_samples())
+
+    # Now perform the operation
     trimmed_audio = audio[np.abs(audio) > threshold]
     return np.concatenate((trimmed_audio, np.zeros(int(0.01 * sample_rate))))  # Add slight padding
 
